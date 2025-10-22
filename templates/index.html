@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <script src="{{ url_for('static', path='/js/script.js') }}"></script>
+    <title>{{ title }}</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; margin-top: 100px;">
+    <h1>👋 Bienvenue sur FastAPI + Jinja2 !</h1>
+    <p>Si tu vois cette page, ton serveur FastAPI fonctionne 🎉</p>
+    <p>Variable reçue : <b>{{ title }}</b></p>
+</body>
+</html>

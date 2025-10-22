@@ -25,3 +25,6 @@ note personnel j arajouter 3.10 a env pour savoir que c est python 3.10 que j ut
 
 pour lancer app :
 uvicorn main:app --reload
+
+pour acceder a docs de FastAPI
+http://127.0.0.1:8000/docs
