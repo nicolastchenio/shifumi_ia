@@ -1,30 +1,21 @@
 const video = document.getElementById("webcam");
 const captureBtn = document.getElementById("capture-btn");
 const statusText = document.getElementById("status");
+const resultText = document.getElementById("result");
 
-// Accès à la webcam
+// Accès webcam
 navigator.mediaDevices.getUserMedia({ video: true })
-    .then(stream => {
-        video.srcObject = stream;
-    })
-    .catch(err => {
-        console.error("Erreur accès webcam :", err);
-        statusText.textContent = "Impossible d’accéder à la webcam";
-    });
+    .then(stream => { video.srcObject = stream; })
+    .catch(err => { console.error(err); statusText.textContent = "Impossible d’accéder à la webcam"; });
 
-// Capture l'image et envoie au serveur
+// Capture et envoie au serveur
 captureBtn.addEventListener("click", () => {
-    // Créer un canvas temporaire
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
-
-    // Convertir en base64
+    canvas.getContext("2d").drawImage(video, 0, 0);
     const dataURL = canvas.toDataURL("image/jpeg");
 
-    // Envoyer au serveur via fetch
     fetch("/capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,10 +23,8 @@ captureBtn.addEventListener("click", () => {
     })
     .then(resp => resp.json())
     .then(data => {
-        statusText.textContent = data.message;
+        statusText.textContent = "Geste capturé !";
+        resultText.textContent = `Ton choix : ${data.player} | Ordinateur : ${data.computer} | Résultat : ${data.result}`;
     })
-    .catch(err => {
-        console.error(err);
-        statusText.textContent = "Erreur serveur";
-    });
+    .catch(err => { console.error(err); statusText.textContent = "Erreur serveur"; });
 });
