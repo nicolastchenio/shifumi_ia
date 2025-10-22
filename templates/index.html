@@ -2,24 +2,18 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
-    <script src="{{ url_for('static', path='/js/script.js') }}"></script>
-    <title>Shifumi Minimal</title>
+    <title>Shifumi Webcam Minimal</title>
 </head>
-<body style="text-align: center; margin-top: 100px;">
-    <h1>Shifumi - Version Minimal</h1>
+<body style="text-align: center; margin-top: 50px;">
+    <h1>Shifumi - Test Webcam</h1>
 
-    <form method="post">
-        <button name="player_choice" value="Pierre">✊ Pierre</button>
-        <button name="player_choice" value="Feuille">✋ Feuille</button>
-        <button name="player_choice" value="Ciseaux">✌️ Ciseaux</button>
-    </form>
+    <!-- Vidéo webcam -->
+    <video id="webcam" autoplay playsinline width="400"></video>
+    <br><br>
+    <button id="capture-btn">Capturer le geste</button>
 
-    {% if result %}
-        <h2>Ton choix : {{ result.player }}</h2>
-        <h2>Ordinateur : {{ result.computer }}</h2>
-        <h2>Résultat : {{ result.result }}</h2>
-    {% endif %}
+    <h3 id="status"></h3>
+
+    <script src="/static/js/webcam.js"></script>
 </body>
 </html>
-
