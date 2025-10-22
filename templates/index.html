@@ -4,11 +4,22 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
     <script src="{{ url_for('static', path='/js/script.js') }}"></script>
-    <title>{{ title }}</title>
+    <title>Shifumi Minimal</title>
 </head>
-<body style="font-family: sans-serif; text-align: center; margin-top: 100px;">
-    <h1>👋 Bienvenue sur FastAPI + Jinja2 !</h1>
-    <p>Si tu vois cette page, ton serveur FastAPI fonctionne 🎉</p>
-    <p>Variable reçue : <b>{{ title }}</b></p>
+<body style="text-align: center; margin-top: 100px;">
+    <h1>Shifumi - Version Minimal</h1>
+
+    <form method="post">
+        <button name="player_choice" value="Pierre">✊ Pierre</button>
+        <button name="player_choice" value="Feuille">✋ Feuille</button>
+        <button name="player_choice" value="Ciseaux">✌️ Ciseaux</button>
+    </form>
+
+    {% if result %}
+        <h2>Ton choix : {{ result.player }}</h2>
+        <h2>Ordinateur : {{ result.computer }}</h2>
+        <h2>Résultat : {{ result.result }}</h2>
+    {% endif %}
 </body>
 </html>
+

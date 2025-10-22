@@ -8,6 +8,7 @@ Bibliothéque utilisé :
 - opencv-python
 - mediapipe
 - numpy
+- python-multipart
 
 Probleme pour mediapipe il faut une version de Python comprise entre 3.8 et 3.11
 
