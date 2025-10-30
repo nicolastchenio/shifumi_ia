@@ -44,7 +44,7 @@ hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
 mp_drawing = mp.solutions.drawing_utils
 
 
-# --- Fonction utilitaire pour distance euclidienne ---
+# --- Distance euclidienne ---
 def distance(a, b):
     return math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
 
@@ -73,36 +73,44 @@ async def capture(data: dict):
         hand_label = results.multi_handedness[0].classification[0].label  # "Left" ou "Right"
         wrist = hand_landmarks.landmark[0]
 
-        # Liste des landmarks clés
+        # --- Identifier quels doigts sont ouverts ---
         tips_ids = [4, 8, 12, 16, 20]  # pouce, index, majeur, annulaire, auriculaire
-        fingers_open = 0
+        open_fingers = []
 
-        # Vérification de chaque doigt
         for tip_id in tips_ids:
             finger_tip = hand_landmarks.landmark[tip_id]
             finger_dip = hand_landmarks.landmark[tip_id - 2]
 
             if tip_id == 4:  # Pouce
-                if hand_label == "Right":
-                    if finger_tip.x > finger_dip.x:
-                        fingers_open += 1
-                else:  # Main gauche
-                    if finger_tip.x < finger_dip.x:
-                        fingers_open += 1
+                if hand_label == "Right" and finger_tip.x > finger_dip.x:
+                    open_fingers.append(tip_id)
+                elif hand_label == "Left" and finger_tip.x < finger_dip.x:
+                    open_fingers.append(tip_id)
             else:
-                if finger_tip.y < finger_dip.y:
-                    fingers_open += 1
+                if finger_tip.y < finger_dip.y:  # doigt levé
+                    open_fingers.append(tip_id)
 
-        # Distance moyenne des doigts ouverts au poignet (robustesse)
-        distances = [distance(wrist, hand_landmarks.landmark[i]) for i in [8, 12, 16, 20]]
-        avg_dist = sum(distances) / len(distances)
+        fingers_open = len(open_fingers)
 
-        # --- Détermination finale du geste ---
+        # --- Distances des doigts au poignet ---
+        dist_index = distance(wrist, hand_landmarks.landmark[8])
+        dist_middle = distance(wrist, hand_landmarks.landmark[12])
+        dist_ring = distance(wrist, hand_landmarks.landmark[16])
+        dist_pinky = distance(wrist, hand_landmarks.landmark[20])
+        avg_dist = (dist_index + dist_middle + dist_ring + dist_pinky) / 4
+
+        # --- Logique améliorée ---
         if fingers_open == 0:
             gesture = "Pierre"
-        elif fingers_open == 2:
-            gesture = "Ciseaux"
-        elif fingers_open > 2 or avg_dist > 0.25:
+
+        elif 8 in open_fingers and 12 in open_fingers and fingers_open <= 3:
+            # Vérifie que les autres doigts sont bien plus proches du poignet
+            if dist_ring < dist_middle * 0.75 and dist_pinky < dist_middle * 0.75:
+                gesture = "Ciseaux"
+            else:
+                gesture = "Feuille"
+
+        elif fingers_open >= 4 or avg_dist > 0.25:
             gesture = "Feuille"
         else:
             gesture = "Inconnu"
