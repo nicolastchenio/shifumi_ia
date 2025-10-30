@@ -22,7 +22,7 @@ py -3.10 -m venv env3.10
 activer l'environnement virtuel
 env3.10\Scripts\activate
 
-note personnel j arajouter 3.10 a env pour savoir que c est python 3.10 que j utilise
+note personnel j ai rajouter 3.10 a env pour savoir que c est python 3.10 que j utilise
 
 pour lancer app :
 uvicorn main:app --reload
