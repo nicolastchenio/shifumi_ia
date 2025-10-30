@@ -93,17 +93,16 @@ async def capture(data: dict):
                 if finger_tip.y < finger_dip.y:
                     fingers_open += 1
 
-        # Vérification supplémentaire pour "Feuille"
-        # (si les doigts sont globalement écartés du poignet)
+        # Distance moyenne des doigts ouverts au poignet (robustesse)
         distances = [distance(wrist, hand_landmarks.landmark[i]) for i in [8, 12, 16, 20]]
         avg_dist = sum(distances) / len(distances)
 
-        # Détermination finale du geste
+        # --- Détermination finale du geste ---
         if fingers_open == 0:
             gesture = "Pierre"
         elif fingers_open == 2:
             gesture = "Ciseaux"
-        elif fingers_open >= 4 or avg_dist > 0.25:  # main bien ouverte
+        elif fingers_open > 2 or avg_dist > 0.25:
             gesture = "Feuille"
         else:
             gesture = "Inconnu"
