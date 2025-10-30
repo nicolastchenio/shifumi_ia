@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 import mediapipe as mp
 import random
+import math
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -43,6 +44,11 @@ hands = mp_hands.Hands(static_image_mode=True, max_num_hands=1)
 mp_drawing = mp.solutions.drawing_utils
 
 
+# --- Fonction utilitaire pour distance euclidienne ---
+def distance(a, b):
+    return math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2)
+
+
 # --- Détection du geste Shifumi ---
 @app.post("/capture")
 async def capture(data: dict):
@@ -65,6 +71,7 @@ async def capture(data: dict):
     if results.multi_hand_landmarks:
         hand_landmarks = results.multi_hand_landmarks[0]
         hand_label = results.multi_handedness[0].classification[0].label  # "Left" ou "Right"
+        wrist = hand_landmarks.landmark[0]
 
         # Liste des landmarks clés
         tips_ids = [4, 8, 12, 16, 20]  # pouce, index, majeur, annulaire, auriculaire
@@ -83,16 +90,20 @@ async def capture(data: dict):
                     if finger_tip.x < finger_dip.x:
                         fingers_open += 1
             else:
-                # Pour les autres doigts, on compare la position verticale
                 if finger_tip.y < finger_dip.y:
                     fingers_open += 1
 
-        # Détermination du geste selon le nombre de doigts ouverts
+        # Vérification supplémentaire pour "Feuille"
+        # (si les doigts sont globalement écartés du poignet)
+        distances = [distance(wrist, hand_landmarks.landmark[i]) for i in [8, 12, 16, 20]]
+        avg_dist = sum(distances) / len(distances)
+
+        # Détermination finale du geste
         if fingers_open == 0:
             gesture = "Pierre"
         elif fingers_open == 2:
             gesture = "Ciseaux"
-        elif fingers_open == 5:
+        elif fingers_open >= 4 or avg_dist > 0.25:  # main bien ouverte
             gesture = "Feuille"
         else:
             gesture = "Inconnu"
